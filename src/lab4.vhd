@@ -113,6 +113,8 @@ begin
     -- This variable will store the x position of the paddle (left-most pixel of the paddle)
 	 variable paddle_x : unsigned(draw.x'range);
 	 
+	 variable paddle_size : natural := PADDLE_WIDTH;
+	 
 	 -- These variables will store the puck and the puck velocity.
 	 -- In this implementation, the puck velocity has two components: an x component
 	 -- and a y component.  Each component is always +1 or -1.
@@ -121,6 +123,8 @@ begin
 	 
 	 -- This will be used as a counter variable in the IDLE state
     variable clock_counter : natural := 0;	 
+    
+    variable paddleCounter : natural := 0;
 
  begin
  
@@ -141,7 +145,7 @@ begin
 			  puck2.y := to_unsigned(FACEOFF_Y + 15 , puck2.y'length );
 			  puck_velocity2.x := to_signed(-1, puck_velocity2.x'length );
 			  puck_velocity2.y := to_signed(1, puck_velocity2.y'length );		
-			  		  
+			  paddle_size := PADDLE_WIDTH;			  
            colour <= BLACK;
 			  plot <= '1';
 
@@ -151,7 +155,17 @@ begin
 	 -- the standard pattern for a type-3 process we saw in the lecture slides.
 	 
     elsif rising_edge(CLOCK_50) then
-
+      
+      
+      if(paddleCounter = 60000000) then
+        paddleCounter := 0;
+        if(paddle_size /= 4) then
+          paddle_size := paddle_size - 1;
+        end if;
+      else
+        paddleCounter := paddleCounter + 1;
+      end if;
+      
       case state is
 		
 		  -- ============================================================
@@ -173,7 +187,7 @@ begin
 			  puck2.y := to_unsigned(FACEOFF_Y + 15, puck2.y'length );
 			  puck_velocity2.x := to_signed(-1, puck_velocity2.x'length );
 			  puck_velocity2.y := to_signed(-1, puck_velocity2.y'length );		
-			  		  
+			  paddle_size := PADDLE_WIDTH; 
            colour <= BLACK;
 			  plot <= '1';
 			  state := START;  -- next state is START
@@ -374,7 +388,7 @@ begin
 		  when ERASE_PADDLE_LOOP =>
 		  
 		      -- See if we are done erasing the paddle (done with this state)
-            if draw.x = paddle_x+PADDLE_WIDTH then			
+            if draw.x = paddle_x+ PADDLE_WIDTH then			
 				
 				  -- If so, the next state is DRAW_PADDLE_ENTER. 
 				  
@@ -411,7 +425,7 @@ begin
 				     -- If the user has pressed the right button check to make sure we
 					  -- are not already at the rightmost position of the screen
 					  
-				     if paddle_x <= to_unsigned(RIGHT_LINE - PADDLE_WIDTH - 2, paddle_x'length) then 
+				     if paddle_x <= to_unsigned(RIGHT_LINE - paddle_size - 2, paddle_x'length) then 
 
      					   -- add 2 to the paddle position
                   	paddle_x := paddle_x + to_unsigned(2, paddle_x'length) ;
@@ -448,7 +462,7 @@ begin
 		  
 		      -- See if we are done drawing the paddle
 
-            if draw.x = paddle_x+PADDLE_WIDTH then
+            if draw.x = paddle_x+paddle_size then
 				
 				  -- If we are done drawing the paddle, set up for the next state
 				  
@@ -497,7 +511,7 @@ begin
 	           -- the screen		
 				  
 		        if puck1.y = PADDLE_ROW - 1 then
-				     if puck1.x >= paddle_x and puck1.x <= paddle_x + PADDLE_WIDTH then
+				     if puck1.x >= paddle_x and puck1.x <= paddle_x + paddle_size then
 					  
 					     -- we have bounced off the paddle
    				     puck_velocity1.y := 0-puck_velocity1.y;
@@ -533,7 +547,7 @@ begin
 	           -- the screen		
 				  
 		        if puck2.y = PADDLE_ROW - 1 then
-				     if puck2.x >= paddle_x and puck2.x <= paddle_x + PADDLE_WIDTH then
+				     if puck2.x >= paddle_x and puck2.x <= paddle_x + paddle_size then
 					  
 					     -- we have bounced off the paddle
    				     puck_velocity2.y := 0-puck_velocity2.y;
