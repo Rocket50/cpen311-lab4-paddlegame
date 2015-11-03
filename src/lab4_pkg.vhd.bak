@@ -43,7 +43,7 @@ package lab4_pkg is
 									DRAW_LEFT_ENTER, DRAW_LEFT_LOOP, IDLE, 
 									ERASE_PADDLE_ENTER, ERASE_PADDLE_LOOP, 
 									DRAW_PADDLE_ENTER, DRAW_PADDLE_LOOP, 
-									ERASE_PUCK1, DRAW_PUCK1, ERASE_PUCK2, DRAW_PUCK2);
+									ERASE_PUCK, DRAW_PUCK);
 
   -- Here are some constants that we will use in the code. 
  
