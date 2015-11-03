@@ -348,7 +348,7 @@ begin
 		  when ERASE_PADDLE_ENTER =>		  
               draw.y <= to_unsigned(PADDLE_ROW, draw.y'length);
 		     	  draw.x <= paddle_x;	
-              colour <= BLACK;
+              colour <= CYAN;
               plot <= '1';			
               state := ERASE_PADDLE_LOOP;				 
 				  
@@ -423,7 +423,7 @@ begin
 				  
    		     draw.y <= to_unsigned(PADDLE_ROW, draw.y'length);				  
 				  draw.x <= paddle_x;  -- get ready for next state			  
-              colour <= CYAN; -- when we draw the paddle, the colour will be WHITE		  
+              colour <= WHITE; -- when we draw the paddle, the colour will be WHITE		  
 		        state := DRAW_PADDLE_LOOP;
 
 		  -- ============================================================
@@ -501,7 +501,7 @@ begin
 		  -- ============================================================
 		  
         when DRAW_PUCK =>
-				  colour <= GREEN;
+				  colour <= WHITE;
               plot <= '1';
 				  draw <= puck;
 				  state := IDLE;	  -- next state is IDLE (which is the delay state)			  
