@@ -157,7 +157,7 @@ begin
     elsif rising_edge(CLOCK_50) then
       
       
-      if(paddleCounter = 60000000) then
+      if(paddleCounter = 600000000) then
         paddleCounter := 0;
         if(paddle_size /= 4) then
           paddle_size := paddle_size - 1;
@@ -489,6 +489,7 @@ begin
         when ERASE_PUCK1 =>
 				  colour <= BLACK;  -- erase by setting colour to black
               plot <= '1';
+ 
 				  draw.x <= puck1.x(15 downto 8);  -- the x and y lines are driven by "puck" which 
 				  draw.y <= puck1.y(15 downto 8); 
 				                 -- holds the location of the puck.
@@ -512,16 +513,18 @@ begin
               -- See if we have bounced of the paddle on the bottom row of
 	           -- the screen		
 				  
-		        if puck1.y(15 downto 8) = PADDLE_ROW - 1 then
+		        if puck1.y(15 downto 8) >= PADDLE_ROW - 1 then
 				     if puck1.x(15 downto 8) >= paddle_x and puck1.x(15 downto 8) <= paddle_x + paddle_size then
 					  
 					     -- we have bounced off the paddle
+					     puck1.y := to_unsigned(PADDLE_ROW - 1, puck1.y'length/2) & 8d"0"; 
    				     puck_velocity1.y := 0-puck_velocity1.y;
 				  else
 				        -- we are at the bottom row, but missed the paddle.  Reset game!
 					     state := INIT;
-					  end if;	  
+					  end if; 
 				  end if;
+				  puck_velocity1.y := puck_velocity1.y + GRAV;
 				  
 				  when ERASE_PUCK2 =>
 				  colour <= BLACK;  -- erase by setting colour to black
@@ -529,6 +532,7 @@ begin
 				  draw.x <= puck2.x(15 downto 8);  -- the x and y lines are driven by "puck" which 
 				  draw.y <= puck2.y(15 downto 8);  -- the x and y lines are driven by "puck" which 
 				                 -- holds the location of the puck.
+				                 
 				  state := DRAW_PUCK1;  -- next state is DRAW_PUCK.
 
 				  -- update the location of the puck 
@@ -549,17 +553,18 @@ begin
               -- See if we have bounced of the paddle on the bottom row of
 	           -- the screen		
 				  
-		        if puck2.y(15 downto 8) = PADDLE_ROW - 1 then
+		        if puck2.y(15 downto 8) >= PADDLE_ROW - 1 then
 				     if puck2.x(15 downto 8) >= paddle_x and puck2.x(15 downto 8) <= paddle_x + paddle_size then
 					  
 					     -- we have bounced off the paddle
+					   puck2.y := to_unsigned(PADDLE_ROW - 1, puck2.y'length/2) & 8d"0"; 
    				     puck_velocity2.y := 0-puck_velocity2.y;
 				  else
 				        -- we are at the bottom row, but missed the paddle.  Reset game!
 					     state := INIT;
 					  end if;	  
 				  end if;
-				  
+				  puck_velocity2.y := puck_velocity2.y + GRAV;
 		  -- ============================================================
         -- The DRAW_PUCK draws the puck.  Note that since
 		  -- the puck is only one pixel, we only need to be here for one cycle.					 
