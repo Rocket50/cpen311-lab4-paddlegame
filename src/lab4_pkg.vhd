@@ -65,12 +65,12 @@ package lab4_pkg is
 
   -- These constants describe the starting location for the puck 
   constant FACEOFF_X : natural := SCREEN_WIDTH/2;
-  constant FACEOFF_Y : natural := SCREEN_HEIGHT/2;
+  constant FACEOFF_Y : natural := SCREEN_HEIGHT/2;y7u8dd
   
   constant PUCK1_SPEEDX : signed(15 downto 0) := 8d"0" & "11110101";
   constant PUCK1_SPEEDY : signed(15 downto 0) := not(8d"0" & "01000000") + 1;
   
-  constant GRAV : signed(15 downto 0) := 8d"0" & "00000010";
+  constant GRAV : signed(15 downto 0) := 8d"0" & "00000100";
   
   constant PUCK2_SPEEDX : signed(15 downto 0) := not(8d"0" & "10000000") + 1;
   --constant PUCK2_SPEEDY : signed(15 downto 0) := 8d"0" & "11011100";

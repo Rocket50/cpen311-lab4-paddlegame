@@ -70,10 +70,11 @@ package lab4_pkg is
   constant PUCK1_SPEEDX : signed(15 downto 0) := 8d"0" & "11110101";
   constant PUCK1_SPEEDY : signed(15 downto 0) := not(8d"0" & "01000000") + 1;
   
-  constant GRAV : signed(15 downto 0) := 8d"0" & "00000010";
+  constant GRAV : signed(15 downto 0) := 8d"0" & "00000100";
   
   constant PUCK2_SPEEDX : signed(15 downto 0) := not(8d"0" & "10000000") + 1;
-  constant PUCK2_SPEEDY : signed(15 downto 0) := 8d"0" & "11011100";
+  --constant PUCK2_SPEEDY : signed(15 downto 0) := 8d"0" & "11011100";
+  constant PUCK2_SPEEDY : signed(15 downto 0) := not(8d"0" & "11011100") + 1;
   -- This constant indicates how many times the counter should count in the
   -- START state between each invocation of the main loop of the program.
   -- A larger value will result in a slower game.  The current setting will    

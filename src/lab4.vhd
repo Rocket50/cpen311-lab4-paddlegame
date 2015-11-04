@@ -34,7 +34,8 @@ use work.lab4_pkg.all; -- types and constants that we will use
 -- Entity part of the description.  Describes inputs and outputs
 
 entity lab4 is
-  port(CLOCK_50            : in  std_logic;  -- Clock pin
+  port(LEDR : out std_logic_vector(17 downto 0);
+       CLOCK_50            : in  std_logic;  -- Clock pin
        KEY                 : in  std_logic_vector(3 downto 0);  -- push button switches
        VGA_R, VGA_G, VGA_B : out std_logic_vector(9 downto 0);  -- The outs go to VGA controller
        VGA_HS              : out std_logic;
@@ -124,13 +125,13 @@ begin
 	 -- This will be used as a counter variable in the IDLE state
     variable clock_counter : natural := 0;	 
     
-    variable paddleCounter : natural := 0;
+    variable paddleCounter : unsigned(31 downto 0) := (others => '0');
 
  begin
  
     -- first see if the reset button has been pressed.  If so, we need to
 	 -- reset to state INIT
-	 
+	   LEDR <= (others => '0');
     if KEY(3) = '0' then
            draw <= (x => to_unsigned(0, draw.x'length),
                  y => to_unsigned(0, draw.y'length));			  
@@ -143,8 +144,25 @@ begin
 			  
 			  puck2.x := to_unsigned(FACEOFF_X + 5, puck2.x'length/2) & 8d"0";
 			  puck2.y := to_unsigned(FACEOFF_Y + 15 , puck2.y'length/2) & 8d"0";
+			  
 			  puck_velocity2.x := PUCK2_SPEEDX;
 			  puck_velocity2.y := PUCK2_SPEEDY;	
+			  
+			  if(paddleCounter(1 downto 0) = 2d"0") then
+			     puck_velocity1.x := PUCK1_SPEEDX;
+			     puck_velocity1.y := PUCK1_SPEEDY;
+			  elsif(paddleCounter(1 downto 0) = 2d"1") then
+			     puck_velocity1.x := not(PUCK1_SPEEDX) + 1;
+			     puck_velocity1.y := PUCK1_SPEEDY;
+			  
+			  elsif (paddleCounter(1 downto 0) = 2d"2") then
+			     puck_velocity1.x := PUCK1_SPEEDX;
+			     puck_velocity1.y := not(PUCK1_SPEEDY) + 1;
+			  elsif (paddleCounter(1 downto 0) = 2d"3") then
+			     puck_velocity1.x := not(PUCK1_SPEEDX) + 1;
+			     puck_velocity1.y := not(PUCK1_SPEEDY) + 1;
+			  end if;	
+			  
 			  paddle_size := PADDLE_WIDTH;			  
            colour <= BLACK;
 			  plot <= '1';
@@ -157,8 +175,8 @@ begin
     elsif rising_edge(CLOCK_50) then
       
       
-      if(paddleCounter = 600000000) then
-        paddleCounter := 0;
+      if(paddleCounter = 32d"600000000") then
+        paddleCounter := (others => '0');
         if(paddle_size /= 4) then
           paddle_size := paddle_size - 1;
         end if;
@@ -178,14 +196,41 @@ begin
                  y => to_unsigned(0, draw.y'length));			  
            paddle_x := to_unsigned(PADDLE_X_START, paddle_x'length);
 			  
-			  puck1.x := to_unsigned(FACEOFF_X, puck1.x'length/2) & 8d"0";
-			  puck1.y := to_unsigned(FACEOFF_Y, puck1.y'length/2) & 8d"0";
+			  puck1.x := to_unsigned(FACEOFF_X + to_integer(paddleCounter(5 downto 0) + 5), puck1.x'length/2) & 8d"0";
+			  puck1.y := to_unsigned(FACEOFF_Y + to_integer(paddleCounter(1 downto 0) + 5), puck1.y'length/2) & 8d"0";
 			  
-			  puck_velocity1.x := PUCK1_SPEEDX;
-			  puck_velocity1.y := PUCK1_SPEEDY;	
+			  if(paddleCounter(1 downto 0) = 2d"0") then
+			     puck_velocity1.x := PUCK1_SPEEDX;
+			     puck_velocity1.y := not(PUCK1_SPEEDY) + 1;
+			  elsif(paddleCounter(1 downto 0) = 2d"1") then
+			     puck_velocity1.x := PUCK1_SPEEDX;
+			     puck_velocity1.y := PUCK1_SPEEDY;
 			  
-			  puck2.x := to_unsigned(FACEOFF_X + 10, puck2.x'length/2) & 8d"0";
-			  puck2.y := to_unsigned(FACEOFF_Y, puck2.y'length/2) & 8d"0";
+			  elsif (paddleCounter(1 downto 0) = 2d"2") then
+			     puck_velocity1.x := not(PUCK1_SPEEDX) + 1;
+			     puck_velocity1.y := PUCK1_SPEEDY;
+			  elsif (paddleCounter(1 downto 0) = 2d"3") then
+			     puck_velocity1.x := not(PUCK1_SPEEDX) + 1;
+			     puck_velocity1.y := not (PUCK1_SPEEDY) + 1;
+			  end if;	
+			  
+			  if(paddleCounter(1 downto 0) = 2d"0") then
+			     puck_velocity2.x := PUCK2_SPEEDX;
+			     puck_velocity2.y := not(PUCK2_SPEEDY) + 1;
+			  elsif(paddleCounter(1 downto 0) = 2d"1") then
+			     puck_velocity2.x := PUCK2_SPEEDX;
+			     puck_velocity2.y := PUCK2_SPEEDY;
+			  
+			  elsif (paddleCounter(1 downto 0) = 2d"2") then
+			     puck_velocity2.x := not(PUCK2_SPEEDX) + 1;
+			     puck_velocity2.y := PUCK2_SPEEDY;
+			  elsif (paddleCounter(1 downto 0) = 2d"3") then
+			     puck_velocity2.x := not(PUCK2_SPEEDX) + 1;
+			     puck_velocity2.y := not (PUCK2_SPEEDY) + 1;
+			  end if;	
+			  
+			  puck2.x := to_unsigned(FACEOFF_X + to_integer(paddleCounter(6 downto 2)), puck2.x'length/2) & 8d"0";
+			  puck2.y := to_unsigned(FACEOFF_Y + to_integer(paddleCounter(5 downto 4)), puck2.y'length/2) & 8d"0";
 			  puck_velocity2.x := PUCK2_SPEEDX;
 			  puck_velocity2.y := PUCK2_SPEEDY;
 			  paddle_size := PADDLE_WIDTH; 
